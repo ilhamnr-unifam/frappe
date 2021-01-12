@@ -36,24 +36,26 @@ def get_submitted_linked_docs(doctype, name, docs=None):
 
 	link_count = 0
 	for link_doctype, link_names in linked_docs.items():
-		for link in link_names:
-			docinfo = link.update({"doctype": link_doctype})
-			validated_doc = validate_linked_doc(docinfo)
+		# add by jr 20210112 (allow cancel sales invoice which is already create route sheet and ar collection)
+		if 	not (doctype == 'Sales Invoice' and (link_doctype == 'Route Sheet' or link_doctype == 'AR Collection' or link_doctype == 'AR Collection Return')):  
+			for link in link_names:
+				docinfo = link.update({"doctype": link_doctype})
+				validated_doc = validate_linked_doc(docinfo)
 
-			if not validated_doc:
-				continue
+				if not validated_doc:
+					continue
 
-			link_count += 1
-			if link.name in [doc.get("name") for doc in docs]:
-				continue
+				link_count += 1
+				if link.name in [doc.get("name") for doc in docs]:
+					continue
 
-			links = get_submitted_linked_docs(link_doctype, link.name, docs)
-			docs.append({
-				"doctype": link_doctype,
-				"name": link.name,
-				"docstatus": link.docstatus,
-				"link_count": links.get("count")
-			})
+				links = get_submitted_linked_docs(link_doctype, link.name, docs)
+				docs.append({
+					"doctype": link_doctype,
+					"name": link.name,
+					"docstatus": link.docstatus,
+					"link_count": links.get("count")
+				})
 
 	# sort linked documents by ascending number of links
 	docs.sort(key=lambda doc: doc.get("link_count"))

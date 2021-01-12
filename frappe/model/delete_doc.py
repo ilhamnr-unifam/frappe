@@ -299,8 +299,10 @@ def raise_link_exists_exception(doc, reference_doctype, reference_docname, row='
 	if reference_doctype == reference_docname:
 		reference_doctype = ''
 
-	frappe.throw(_('Cannot delete or cancel because {0} {1} is linked with {2} {3} {4}')
-		.format(doc.doctype, doc_link, reference_doctype, reference_link, row), frappe.LinkExistsError)
+	# add by jr 20210112 (allow cancel sales invoice which is already create route sheet and ar collection)
+	if not (doc.doctype == 'Sales Invoice' and (reference_doctype == 'Route Sheet' or reference_doctype == 'AR Collection' or reference_doctype == 'AR Collection Return')):  
+		frappe.throw(_('Cannot delete or cancel because {0} {1} is linked with {2} {3} {4}')
+			.format(doc.doctype, doc_link, reference_doctype, reference_link, row), frappe.LinkExistsError)
 
 def delete_dynamic_links(doctype, name):
 	delete_references('ToDo', doctype, name, 'reference_type')

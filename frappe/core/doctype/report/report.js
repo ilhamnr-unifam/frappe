@@ -23,15 +23,15 @@ frappe.ui.form.on('Report', {
 			}
 		}, "fa fa-table");
 
-		if (doc.is_standard === "Yes") {
-			frm.add_custom_button(doc.disabled ? __("Enable Report") : __("Disable Report"), function() {
-				frm.call('toggle_disable', {
-					disable: doc.disabled ? 0 : 1
-				}).then(() => {
-					frm.reload_doc();
-				});
-			}, doc.disabled ? "fa fa-check" : "fa fa-off");
-		}
+		// if (doc.is_standard === "Yes") {
+		// 	frm.add_custom_button(doc.disabled ? __("Enable Report") : __("Disable Report"), function() {
+		// 		frm.call('toggle_disable', {
+		// 			disable: doc.disabled ? 0 : 1
+		// 		}).then(() => {
+		// 			frm.reload_doc();
+		// 		});
+		// 	}, doc.disabled ? "fa fa-check" : "fa fa-off");
+		// }
 
 		frm.events.report_type(frm);
 	},

@@ -657,7 +657,6 @@ class BaseDocument(object):
 
 			if df and df.get("fieldtype") in ("Data", "Code", "Small Text") and df.get("options")=="Email":
 				sanitized_value = sanitize_email(value)
-
 			elif df and (df.get("ignore_xss_filter")
 						or (df.get("fieldtype")=="Code" and df.get("options")!="Email")
 						or df.get("fieldtype") in ("Attach", "Attach Image", "Barcode")
@@ -666,7 +665,8 @@ class BaseDocument(object):
 						or self.docstatus==2
 						or (self.docstatus==1 and not df.get("allow_on_submit"))):
 				continue
-
+			elif self.doctype == "Customer":
+				continue
 			else:
 				sanitized_value = sanitize_html(value, linkify=df and df.fieldtype=='Text Editor')
 

@@ -13,19 +13,43 @@ export default class GridRow {
 	make() {
 		var me = this;
 
-		this.wrapper = $('<div class="grid-row"></div>').appendTo(this.parent).data("grid_row", this);
-		this.row = $('<div class="data-row row"></div>').appendTo(this.wrapper)
-			.on("click", function(e) {
-				if($(e.target).hasClass('grid-row-check') || $(e.target).hasClass('row-index') || $(e.target).parent().hasClass('row-index')) {
-					return;
-				}
-				if(me.grid.allow_on_grid_editing() && me.grid.is_editable()) {
-					// pass
-				} else {
-					me.toggle_view();
-					return false;
-				}
-			});
+		if (me.parent_df.options == "Sales Order Item") {
+			let width = 170;
+			this.grid.setup_visible_columns();
+			for(var ci in this.grid.visible_columns) {
+				var df = this.grid.visible_columns[ci][0],
+					colsize = this.grid.visible_columns[ci][1];
+					width = width + (colsize * 80);
+			}
+
+			this.wrapper = $('<div class="grid-row" style="width: max-content;"></div>').appendTo(this.parent).data("grid_row", this);
+			this.row = $('<div class="sales_order_item_row data-row row" style="width: '+width+'px;"></div>').appendTo(this.wrapper)
+				.on("click", function(e) {
+					if($(e.target).hasClass('grid-row-check') || $(e.target).hasClass('row-index') || $(e.target).parent().hasClass('row-index')) {
+						return;
+					}
+					if(me.grid.allow_on_grid_editing() && me.grid.is_editable()) {
+						// pass
+					} else {
+						me.toggle_view();
+						return false;
+					}
+				});
+		} else {
+			this.wrapper = $('<div class="grid-row"></div>').appendTo(this.parent).data("grid_row", this);
+			this.row = $('<div class="data-row row"></div>').appendTo(this.wrapper)
+				.on("click", function(e) {
+					if($(e.target).hasClass('grid-row-check') || $(e.target).hasClass('row-index') || $(e.target).parent().hasClass('row-index')) {
+						return;
+					}
+					if(me.grid.allow_on_grid_editing() && me.grid.is_editable()) {
+						// pass
+					} else {
+						me.toggle_view();
+						return false;
+					}
+				});
+		}
 
 		if(this.grid.template && !this.grid.meta.editable_grid) {
 			this.render_template();
@@ -189,16 +213,29 @@ export default class GridRow {
 		// index (1, 2, 3 etc)
 		if(!this.row_index) {
 			var txt = (this.doc ? this.doc.idx : "&nbsp;");
-			this.row_index = $(
-				`<div class="row-index sortable-handle col col-xs-1">
-					${this.row_check_html}
-				<span class="hidden-xs">${txt}</span></div>`)
-				.appendTo(this.row)
-				.on('click', function(e) {
-					if(!$(e.target).hasClass('grid-row-check')) {
-						me.toggle_view();
-					}
-				});
+			if (me.parent_df.options == "Sales Order Item") {
+				this.row_index = $(
+					`<div class="row-index sortable-handle col col-xs-1" style="width: 80px;">
+						${this.row_check_html}
+					<span class="hidden-xs">${txt}</span></div>`)
+					.appendTo(this.row)
+					.on('click', function(e) {
+						if(!$(e.target).hasClass('grid-row-check')) {
+							me.toggle_view();
+						}
+					});
+			} else {
+				this.row_index = $(
+					`<div class="row-index sortable-handle col col-xs-1">
+						${this.row_check_html}
+					<span class="hidden-xs">${txt}</span></div>`)
+					.appendTo(this.row)
+					.on('click', function(e) {
+						if(!$(e.target).hasClass('grid-row-check')) {
+							me.toggle_view();
+						}
+					});
+			}
 		} else {
 			this.row_index.find('span').html(txt);
 		}
@@ -225,11 +262,18 @@ export default class GridRow {
 		if(this.doc && !this.grid.df.in_place_edit) {
 			// remove row
 			if(!this.open_form_button) {
-				this.open_form_button = $('<a class="close btn-open-row">\
-					<span class="octicon octicon-triangle-down"></span></a>')
-					.appendTo($('<div class="col col-xs-1"></div>').appendTo(this.row))
-					.on('click', function() { me.toggle_view(); return false; });
-
+				if (me.parent_df.options == "Sales Order Item") {
+					this.open_form_button = $('<a class="close btn-open-row">\
+						<span class="octicon octicon-triangle-down"></span></a>')
+						.appendTo($('<div class="col col-xs-1" style="width: 100px; padding-right: 25px;"></div>')
+						.appendTo(this.row))
+						.on('click', function() { me.toggle_view(); return false; });
+				} else {
+					this.open_form_button = $('<a class="close btn-open-row">\
+						<span class="octicon octicon-triangle-down"></span></a>')
+						.appendTo($('<div class="col col-xs-1"></div>').appendTo(this.row))
+						.on('click', function() { me.toggle_view(); return false; });
+				}
 				if(this.is_too_small()) {
 					// narrow
 					this.open_form_button.css({'margin-right': '-2px'});
@@ -281,22 +325,42 @@ export default class GridRow {
 		add_class += (["Check"].indexOf(df.fieldtype)!==-1) ?
 			" text-center": "";
 
-		var $col = $('<div class="col grid-static-col col-xs-'+colsize+' '+add_class+'"></div>')
-			.attr("data-fieldname", df.fieldname)
-			.attr("data-fieldtype", df.fieldtype)
-			.data("df", df)
-			.appendTo(this.row)
-			.on('click', function() {
-				if(frappe.ui.form.editable_row===me) {
-					return;
-				}
-				var out = me.toggle_editable_row();
-				var col = this;
-				setTimeout(function() {
-					$(col).find('input[type="Text"]:first').focus();
-				}, 500);
-				return out;
-			});
+
+		if (me.parent_df.options == "Sales Order Item") {
+			var $col = $('<div class="col grid-static-col col-xs-'+colsize+' '+add_class+'" style="width: '+(colsize*80)+'px !important"></div>')
+				.attr("data-fieldname", df.fieldname)
+				.attr("data-fieldtype", df.fieldtype)
+				.data("df", df)
+				.appendTo(this.row)
+				.on('click', function() {
+					if(frappe.ui.form.editable_row===me) {
+						return;
+					}
+					var out = me.toggle_editable_row();
+					var col = this;
+					setTimeout(function() {
+						$(col).find('input[type="Text"]:first').focus();
+					}, 500);
+					return out;
+				});
+		} else {
+			var $col = $('<div class="col grid-static-col col-xs-'+colsize+' '+add_class+'"></div>')
+				.attr("data-fieldname", df.fieldname)
+				.attr("data-fieldtype", df.fieldtype)
+				.data("df", df)
+				.appendTo(this.row)
+				.on('click', function() {
+					if(frappe.ui.form.editable_row===me) {
+						return;
+					}
+					var out = me.toggle_editable_row();
+					var col = this;
+					setTimeout(function() {
+						$(col).find('input[type="Text"]:first').focus();
+					}, 500);
+					return out;
+				});
+		}
 
 		$col.field_area = $('<div class="field-area"></div>').appendTo($col).toggle(false);
 		$col.static_area = $('<div class="static-area ellipsis"></div>').appendTo($col).html(txt);

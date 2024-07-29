@@ -51,52 +51,102 @@ export default class Grid {
 
 	make() {
 
-		let template = `<div class="form-group">
-			<div class="clearfix">
-				<label class="control-label" style="padding-right: 0px;">${__(this.df.label || '')}</label>
-			</div>
-			<div class="form-grid">
-				<div class="grid-heading-row"></div>
-				<div class="grid-body">
-					<div class="rows"></div>
-					<div class="grid-empty text-center">${__("No Data")}</div>
+		let template = "";
+		if (this.df.options == "Sales Order Item") {
+			template = `<div class="form-group " style="overflow-x: scroll">
+				<div class="clearfix">
+					<label class="control-label" style="padding-right: 0px;">${__(this.df.label || '')} ${__(this.df.options || '')}</label>
 				</div>
-			</div>
-			<div class="small form-clickable-section grid-footer">
-				<div class="row">
-					<div class="col-sm-5 grid-buttons">
-						<button class="btn btn-xs btn-danger grid-remove-rows hidden"
-							style="margin-right: 4px;"
-							data-action="delete_rows">
-							${__("Delete")}
-						</button>
-						<button class="btn btn-xs btn-danger grid-remove-all-rows hidden"
-							style="margin-right: 4px;"
-							data-action="delete_all_rows">
-							${__("Delete All")}
-						</button>
-						<button class="grid-add-multiple-rows btn btn-xs btn-default hidden"
-							style="margin-right: 4px;">
-							${__("Add Multiple")}</a>
-						</button>
-						<!-- hack to allow firefox include this in tabs -->
-						<button class="btn btn-xs btn-default grid-add-row">
-							${__("Add Row")}
-						</button>
-					</div>
-					<div class="col-sm-4 grid-pagination">
-					</div>
-					<div class="col-sm-3 text-right">
-						<a href="#" class="grid-download btn btn-xs btn-default hidden"
-							style="margin-left: 4px;">
-							${__("Download")}</a>
-						<a href="#" class="grid-upload btn btn-xs btn-default hidden"
-							style="margin-left: 4px;">
-							${__("Upload")}</a>
+				<div class="form-grid" style="width: max-content;">
+					<div class="grid-heading-row" style="width: max-content;"></div>
+					<div class="grid-body" style="width: max-content;">
+						<div class="rows" style="width: max-content;"></div>
+						<div class="grid-empty text-center">${__("No Data")}</div>
 					</div>
 				</div>
-			</div>
-		</div>`;
+				<div id="sales_order_item" class="small form-clickable-section grid-footer">
+					<div class="row">
+						<div class="col-sm-5 grid-buttons">
+							<button class="btn btn-xs btn-danger grid-remove-rows hidden"
+								style="margin-right: 4px;"
+								data-action="delete_rows">
+								${__("Delete")}
+							</button>
+							<button class="btn btn-xs btn-danger grid-remove-all-rows hidden"
+								style="margin-right: 4px;"
+								data-action="delete_all_rows">
+								${__("Delete All")}
+							</button>
+							<button class="grid-add-multiple-rows btn btn-xs btn-default hidden"
+								style="margin-right: 4px;">
+								${__("Add Multiple")}</a>
+							</button>
+							<!-- hack to allow firefox include this in tabs -->
+							<button class="btn btn-xs btn-default grid-add-row">
+								${__("Add Row")}
+							</button>
+						</div>
+						<div class="col-sm-4 grid-pagination">
+						</div>
+						<div class="col-sm-3 text-right">
+							<a href="#" class="grid-download btn btn-xs btn-default hidden"
+								style="margin-left: 4px;">
+								${__("Download")}</a>
+							<a href="#" class="grid-upload btn btn-xs btn-default hidden"
+								style="margin-left: 4px;">
+								${__("Upload")}</a>
+						</div>
+					</div>
+				</div>
+			</div>`;
+		} else {
+			template = `<div class="form-group">
+				<div class="clearfix">
+					<label class="control-label" style="padding-right: 0px;">${__(this.df.label || '')}</label>
+				</div>
+				<div class="form-grid">
+					<div class="grid-heading-row"></div>
+					<div class="grid-body">
+						<div class="rows"></div>
+						<div class="grid-empty text-center">${__("No Data")}</div>
+					</div>
+				</div>
+				<div class="small form-clickable-section grid-footer">
+					<div class="row">
+						<div class="col-sm-5 grid-buttons">
+							<button class="btn btn-xs btn-danger grid-remove-rows hidden"
+								style="margin-right: 4px;"
+								data-action="delete_rows">
+								${__("Delete")}
+							</button>
+							<button class="btn btn-xs btn-danger grid-remove-all-rows hidden"
+								style="margin-right: 4px;"
+								data-action="delete_all_rows">
+								${__("Delete All")}
+							</button>
+							<button class="grid-add-multiple-rows btn btn-xs btn-default hidden"
+								style="margin-right: 4px;">
+								${__("Add Multiple")}</a>
+							</button>
+							<!-- hack to allow firefox include this in tabs -->
+							<button class="btn btn-xs btn-default grid-add-row">
+								${__("Add Row")}
+							</button>
+						</div>
+						<div class="col-sm-4 grid-pagination">
+						</div>
+						<div class="col-sm-3 text-right">
+							<a href="#" class="grid-download btn btn-xs btn-default hidden"
+								style="margin-left: 4px;">
+								${__("Download")}</a>
+							<a href="#" class="grid-upload btn btn-xs btn-default hidden"
+								style="margin-left: 4px;">
+								${__("Upload")}</a>
+						</div>
+					</div>
+				</div>
+			</div>`;
+		}
 
 		this.wrapper = $(template)
 			.appendTo(this.parent)
@@ -109,6 +159,8 @@ export default class Grid {
 		this.setup_add_row();
 
 		this.setup_grid_pagination();
+
+		$("#sales_order_item").css("width", $(".sales_order_item_row").width() + 2);
 
 		this.custom_buttons = {};
 		this.grid_buttons = this.wrapper.find('.grid-buttons');
@@ -686,8 +738,11 @@ export default class Grid {
 				}
 
 				total_colsize += df.colsize;
-				if (total_colsize > 11)
-					return false;
+				if (this.doctype != "Sales Order Item") {
+					if (total_colsize > 11) {
+						return false;
+					}
+				}
 				this.visible_columns.push([df, df.colsize]);
 			}
 		}

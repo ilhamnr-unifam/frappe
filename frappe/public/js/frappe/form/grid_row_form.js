@@ -1,8 +1,14 @@
 export default class GridRowForm {
 	constructor(opts) {
-		$.extend(this, opts);
-		this.wrapper = $('<div class="form-in-grid"></div>')
-			.appendTo(this.row.wrapper);
+		if (opts.row.doc.doctype == "Sales Order Item") {
+			$.extend(this, opts);
+			this.wrapper = $('<div class="form-in-grid" style="width:870px; position:absolute;"></div>')
+				.appendTo(this.row.wrapper);
+		} else {
+			$.extend(this, opts);
+			this.wrapper = $('<div class="form-in-grid"></div>')
+				.appendTo(this.row.wrapper);
+		}
 
 	}
 	render() {

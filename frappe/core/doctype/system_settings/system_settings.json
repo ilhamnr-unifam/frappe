@@ -59,7 +59,10 @@
   "hide_footer_in_auto_email_reports",
   "chat",
   "enable_chat",
-  "use_socketio_to_upload_file"
+  "use_socketio_to_upload_file",
+  "api_sec_break",
+  "api_url",
+  "api_authorization"
  ],
  "fields": [
   {
@@ -407,12 +410,29 @@
    "fieldname": "dormant_days",
    "fieldtype": "Int",
    "label": "Run Jobs only Daily if Inactive For (Days)"
+  },
+  {
+   "collapsible": 1,
+   "fieldname": "api_sec_break",
+   "fieldtype": "Section Break",
+   "label": "API"
+  },
+  {
+   "fieldname": "api_url",
+   "fieldtype": "Data",
+   "label": "URL"
+  },
+  {
+   "fieldname": "api_authorization",
+   "fieldtype": "Text",
+   "label": "Authorization",
+   "length": 9999
   }
  ],
  "icon": "fa fa-cog",
  "issingle": 1,
  "links": [],
- "modified": "2020-01-31 06:03:35.595384",
+ "modified": "2024-09-13 09:07:20.862764",
  "modified_by": "Administrator",
  "module": "Core",
  "name": "System Settings",
